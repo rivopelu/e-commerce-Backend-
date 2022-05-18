@@ -12,7 +12,7 @@ const Port = process.env.PORT;
 
 
 //ROUTES++++
-const userRoutes = require('./src/routes/userRoutes')
+const AuthRoutes = require('./src/routes/AuthRoutes')
 
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -30,7 +30,7 @@ app.use(bodyParser())
 
 
 //ROUTES USER ____
-app.use('/api', userRoutes);
+app.use('/api', AuthRoutes);
 
 
 

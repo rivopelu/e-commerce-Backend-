@@ -1,5 +1,9 @@
+require('dotenv').config
 const User = require('../models/User')
+const jwt = require('jsonwebtoken')
 
+
+// REGISTER USER AND ADMIN
 exports.RegisterUser = (req, res) => {
     User.findOne({ email: req.body.email })
         .exec((error, user) => {
@@ -44,9 +48,33 @@ exports.RegisterUser = (req, res) => {
         })
 }
 
+// LOGIN ADMIN CONTROLLERS
+exports.LoginAdmin = (req, res) => {
+    User.findOne({ email: req.body.email })
+        .exec((error, user) => {
+            if (error) return res.status(400).json({ error })
+            if (user) {
+                if (user.authenticate(req.body.password)) {
 
-exports.LoginUser = (req, res) => {
-    return res.status(200).json({
-        message: 'berhasil di login'
-    })
+                    const token = jwt.sign({ _id: user._id }, process.env.SECRET_KEY_TOKEN, { expiresIn: '7d' });
+
+                    const { _id, firstName, lastName, email, role, fullName } = user;
+
+                    res.status(200).json({
+                        token,
+                        user: {
+                            _id, firstName, lastName, email, role, fullName
+                        }
+                    });
+
+                } else {
+                    return res.status(400).json({
+                        status: false,
+                        message: 'Login Failed'
+                    })
+                }
+            } else {
+                return res.status(400).json({ message: 'Something went Wrong' })
+            }
+        })
 }
