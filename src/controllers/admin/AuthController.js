@@ -1,53 +1,51 @@
 require('dotenv').config
-const User = require('../models/User')
+const User = require('../../models/User')
 const jwt = require('jsonwebtoken')
 const { bgRed } = require('colors')
+const bcrypt = require('bcrypt')
 
 
 // REGISTER USER AND ADMIN
 exports.RegisterUser = (req, res) => {
-    User.findOne({ email: req.body.email })
-        .exec((error, user) => {
-            if (user) return res.status(400).json({
-                message: 'user already registered'
+    User.findOne({ email: req.body.email }).exec((error, user) => {
+        if (user)
+            return res.status(400).json({
+                message: "Admin already registered",
             });
-            const unixTime = new Date().getTime();
-            const {
-                firstName,
-                lastName,
-                username,
-                email,
-                password
-            } = req.body
+
+        User.estimatedDocumentCount(async (err, count) => {
+            if (err) return res.status(400).json({ error });
+            let role = "admin";
+            if (count === 0) {
+                role = "super-admin";
+            }
+
+            const { firstName, lastName, email, username, password } = req.body;
+            const hash_password = await bcrypt.hash(password, 10);
             const _user = new User({
                 firstName,
                 lastName,
                 email,
-                hash_password: password,
+                hash_password,
                 username,
-                role: 'user',
-                createdAt: unixTime
+                role,
             });
 
             _user.save((error, data) => {
-                console.log(bgRed(error))
                 if (error) {
                     return res.status(400).json({
-                        message: 'Something went Wrong'
-                    })
+                        message: "Something went wrong",
+                    });
                 }
 
                 if (data) {
                     return res.status(201).json({
-                        status: true,
-                        message: ' User Created Success',
-                        data
-
-                    })
+                        message: "Admin created Successfully..!",
+                    });
                 }
-            })
-
-        })
+            });
+        });
+    });
 }
 
 // LOGIN ADMIN CONTROLLERS
@@ -56,7 +54,7 @@ exports.LoginAdmin = (req, res) => {
         .exec((error, user) => {
             if (error) return res.status(400).json({ error })
             if (user) {
-                if (user.authenticate(req.body.password)) {
+                if (user.authenticate(req.body.password) && user.role === 'admin') {
 
                     const token = jwt.sign({ _id: user._id }, process.env.SECRET_KEY_TOKEN, { expiresIn: '7d' });
 
