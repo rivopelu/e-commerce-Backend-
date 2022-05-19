@@ -2,15 +2,15 @@ const express = require('express');
 const User = require('../models/User')
 const { RegisterUser, LoginAdmin, requireSignin } = require('../controllers/AuthController')
 const router = express.Router()
-
+const { validasiRegister, isRequestValidated, validasiLogin } = require('../validator/authValidator')
 
 
 // LOGIN ROUTES
-router.post('/login', LoginAdmin)
+router.post('/login', validasiLogin, isRequestValidated, LoginAdmin)
 
 
 // REGISTER ROUTES
-router.post('/register', RegisterUser)
+router.post('/register', validasiRegister, isRequestValidated, RegisterUser)
 
 
 // PROFILE ROUTES

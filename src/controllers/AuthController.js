@@ -1,53 +1,44 @@
 require('dotenv').config
 const User = require('../models/User')
 const jwt = require('jsonwebtoken')
-const { bgRed } = require('colors')
-
+const bcrypt = require('bcrypt')
 
 // REGISTER USER AND ADMIN
 exports.RegisterUser = (req, res) => {
-    User.findOne({ email: req.body.email })
-        .exec((error, user) => {
-            if (user) return res.status(400).json({
-                message: 'user already registered'
-            });
-            const unixTime = new Date().getTime();
-            const {
-                firstName,
-                lastName,
-                username,
-                email,
-                password
-            } = req.body
-            const _user = new User({
-                firstName,
-                lastName,
-                email,
-                hash_password: password,
-                username,
-                role: 'user',
-                createdAt: unixTime
+    User.findOne({ email: req.body.email }).exec(async (error, user) => {
+        if (user)
+            return res.status(400).json({
+                error: "User already registered",
             });
 
-            _user.save((error, data) => {
-                console.log(bgRed(error))
-                if (error) {
-                    return res.status(400).json({
-                        message: 'Something went Wrong'
-                    })
-                }
+        const { firstName, lastName, username, email, password } = req.body;
+        const hash_password = await bcrypt.hash(password, 10);
+        const waktu = new Date().getTime()
+        const _user = new User({
+            firstName,
+            lastName,
+            email,
+            hash_password,
+            username,
+            createdAt: waktu,
+            role: 'user'
+        });
 
-                if (data) {
-                    return res.status(201).json({
-                        status: true,
-                        message: ' User Created Success',
-                        data
+        _user.save((error, user) => {
+            if (error) {
+                return res.status(400).json({
+                    message: "Something went wrong",
+                });
+            }
 
-                    })
-                }
-            })
 
-        })
+            return res.status(201).json({
+                message: "registered successfully",
+                data: _user
+            });
+
+        });
+    });
 }
 
 // LOGIN ADMIN CONTROLLERS
