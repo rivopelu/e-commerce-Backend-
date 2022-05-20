@@ -2,7 +2,6 @@ require('dotenv').config() // Dotenv
 const { bgMagenta, bgYellow } = require('colors'); //Colors untuk console.log
 const express = require('express')
 const mongoose = require('mongoose')
-const bodyParser = require('body-parser');
 
 
 
@@ -14,6 +13,7 @@ const Port = process.env.PORT;
 //ROUTES++++
 const AuthRoutes = require('./src/routes/AuthRoutes')
 const AdminRoutes = require('./src/routes/AdminRoutes')
+const CategoryRoutes = require('./src/routes/categoryRoutes');
 
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -26,13 +26,18 @@ mongoose.connect(process.env.MONGO_URI, {
 
 
 app.use(express.json());
-app.use(bodyParser())
+
 
 
 
 //ROUTES USER ____
 app.use('/api', AuthRoutes);
+
+// ROUTES ADMIN
 app.use('/api', AdminRoutes);
+
+// ROUTES CATEGORY
+app.use('/api', CategoryRoutes);
 
 
 

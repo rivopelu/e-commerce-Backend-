@@ -73,10 +73,3 @@ exports.LoginAdmin = (req, res) => {
 }
 
 
-exports.requireSignin = (req, res, next) => {
-    const token = req.headers.authorization.split(" ")[1];
-    const user = jwt.verify(token, process.env.SECRET_KEY_TOKEN);
-    req.user = user
-    console.log(bgRed(user))
-    next()
-}

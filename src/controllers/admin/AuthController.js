@@ -56,7 +56,7 @@ exports.LoginAdmin = (req, res) => {
             if (user) {
                 if (user.authenticate(req.body.password) && user.role === 'admin') {
 
-                    const token = jwt.sign({ _id: user._id }, process.env.SECRET_KEY_TOKEN, { expiresIn: '7d' });
+                    const token = jwt.sign({ _id: user._id, role: user.role }, process.env.SECRET_KEY_TOKEN, { expiresIn: '7d' });
 
                     const { _id, firstName, lastName, email, role, fullName } = user;
 
@@ -80,10 +80,3 @@ exports.LoginAdmin = (req, res) => {
 }
 
 
-exports.requireSignin = (req, res, next) => {
-    const token = req.headers.authorization.split(" ")[1];
-    const user = jwt.verify(token, process.env.SECRET_KEY_TOKEN);
-    req.user = user
-    console.log(bgRed(user))
-    next()
-}
