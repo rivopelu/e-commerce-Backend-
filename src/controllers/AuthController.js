@@ -49,7 +49,7 @@ exports.LoginAdmin = (req, res) => {
             if (user) {
                 if (user.authenticate(req.body.password)) {
 
-                    const token = jwt.sign({ _id: user._id }, process.env.SECRET_KEY_TOKEN, { expiresIn: '7d' });
+                    const token = jwt.sign({ _id: user._id, role: user.role }, process.env.SECRET_KEY_TOKEN, { expiresIn: '7d' });
 
                     const { _id, firstName, lastName, email, role, fullName } = user;
 

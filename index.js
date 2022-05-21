@@ -15,6 +15,7 @@ const AuthRoutes = require('./src/routes/AuthRoutes')
 const AdminRoutes = require('./src/routes/AdminRoutes')
 const CategoryRoutes = require('./src/routes/categoryRoutes');
 const ProductRoutes = require('./src/routes/productRoutes')
+const CartRoutes = require('./src/routes/CartRoutes');
 
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -42,6 +43,9 @@ app.use('/api', CategoryRoutes);
 
 // ROUTES PRODUCT
 app.use('/api', ProductRoutes);
+
+// ROUTES CART
+app.use('/api', CartRoutes);
 
 
 
